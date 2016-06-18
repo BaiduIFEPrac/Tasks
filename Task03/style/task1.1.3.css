@@ -1,0 +1,15 @@
+body, .mainBody{margin: 0; padding: 20px; font-family: 'Microsoft YaHei'; }
+	ul, li, h3, h4, p{margin: 0; padding: 0; list-style: none;}
+	img{width: 80px; height: 80px;}
+	.mainBody{position: relative; background: #eee; border: 1px solid #999; zoom: 1; min-width: 520px;}
+	.mainBody:after{content: ""; display: block; clear: both;}
+	.teamInfo{position: relative; float: left; border: 1px solid #999; width: 200px; background: #FFF;}
+	
+	.teamInfo .teamLogo{ padding: 20px; }
+	.teamInfo .teamName{position: relative; width: 80px; float: right; text-align: left; font-size: 10px; overflow: hidden;}
+	.teamName span{height: 16px; line-height: 16px; font-weight: bold; display: block;  margin-right: 20px; padding-top: 20px;  overflow: hidden;}
+	
+	.content{background: #FFF; border: 1px solid #999; margin: 0 140px 0 220px; padding: 20px; }
+	.content p{line-height: 32px;}
+	.selfInfo{float: right; width: 120px; background: #FFF; border: 1px solid #999;}
+	.selfInfo li{margin: 20px;}
