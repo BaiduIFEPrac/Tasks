@@ -1,0 +1,19 @@
+html, body{width: 100%; height: 100%; padding: 0; margin: 0;}
+			.content{position: relative; border: 1px solid #999; zoom: 1; padding: 10px;}
+			.content:after{content: ""; display: block; clear: both;}
+			[class *= col-md-]{ position: relative; float: left; padding: 10px; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;}
+			.inner{height: 50px; background: #eee; border: 1px solid #999; }
+			@media screen and (min-width: 762px){
+				.col-md-1{width: 8.333333%;}
+				.col-md-2{width: 16.666667%;}
+				.col-md-3{width: 25%;}
+				.col-md-4{width: 33.333333%;}
+				.col-md-6{width: 50%;}
+			}
+			@media screen and (max-width: 762px){
+				.col-sm-2{width: 20%;}
+				.col-sm-3{width: 25%;}
+				.col-sm-6{width: 50%;}
+				.col-sm-8{width: 60%;}
+				.col-sm-12{width: 100%;}
+			}
