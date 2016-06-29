@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "utf-8" />
+		<title>Task 18</title>
+		<style>
+			*{margin: 0; padding: 0; font-family: verdana,sans-serif;}
+			.content{
+				position: relative;
+				padding: 5px;
+				zoom: 1;
+			}
+			.content: after{
+				content: "";
+				display: block;
+				clear: both;
+			}
+			.cube{
+				width: 50px;
+				height: 50px;
+				line-height: 50px;
+				border: 1px solid black;
+				background: red;
+				text-align: center;
+				float: left;
+				margin-right: 5px;
+			}
+		</style>
+		<script>
+			window.onload = function(){
+				
+				var container = document.getElementsByClassName("content")[0];
+				var btnLeftOut = document.getElementById("btnLeftOut");
+				var btnRightOut = document.getElementById("btnRightOut");
+				var btnLeftIn = document.getElementById("btnLeftIn");
+				var btnRightIn = document.getElementById("btnRightIn");
+				var inputStr = document.getElementById("num");
+				
+				var childInnerHTML = [];
+				
+				for(var i = 0; i< container.childElementCount; i++){
+					childInnerHTML.push(container.children[i].outerHTML);
+				}
+				
+				var optionOrder = {
+					str: childInnerHTML,
+					leftPop: function(){
+								var tempStr = container.firstElementChild.innerText;
+								alert(tempStr);
+								this.str.shift();
+								container.innerHTML = this.str.toString().replace(/,/g, "");
+							
+					
+							 },
+					leftPush: function(){
+								if(inputStr.value.match(/\d+/)){
+									var tempHTML = "<div class = 'cube'>" + inputStr.value + "</div>";
+									this.str.unshift(tempHTML);
+									container.innerHTML = this.str.toString().replace(/,/g, "");
+									init();
+								} else {
+									alert("请输入数字");
+								}
+							 },
+					rightPop: function(){
+								var tempStr = container.lastElementChild.innerText;
+								alert(tempStr);
+								this.str.pop();
+								container.innerHTML = this.str.toString().replace(/,/g, "");
+								init();
+							  },
+					rightPush: function(){
+								if(inputStr.value.match(/\d+/)){
+									var tempHTML = "<div class = 'cube'>" + inputStr.value + "</div>";
+									this.str.push(tempHTML);
+									container.innerHTML = this.str.toString().replace(/,/g, "");
+									init();
+								} else {
+									alert("请输入数字");
+								}
+							 },
+					deleteDiv: function(index){
+								this.str.splice(index, 1);
+								container.innerHTML = this.str.toString().replace(/,/g, "");
+								init();
+							 }
+				};
+				function init(){
+					for(var i = 0; i<container.childElementCount; i++){
+						container.children[i].addEventListener("click", function(i){
+							return function(){
+								alert(container.children[i].innerText);
+								return optionOrder.deleteDiv(i);
+							}
+						}(i), false);
+					}	
+				}
+				
+				if(btnLeftOut.addEventListener){
+					btnLeftOut.addEventListener("click", function(){
+						optionOrder.leftPop();
+					}, false);
+				}
+				if(btnRightOut.addEventListener){
+					btnRightOut.addEventListener("click", function(){
+						optionOrder.rightPop();
+					}, false);
+				}
+				if(btnLeftIn.addEventListener){
+					btnLeftIn.addEventListener("click", function(){
+						optionOrder.leftPush();
+					}, false);
+				}
+				if(btnRightIn.addEventListener){
+					btnRightIn.addEventListener("click", function(){
+						optionOrder.rightPush();
+					}, false);
+				}
+				init();
+				/*btnLeftOut.onclick = function(){
+					if(container.childElementCount > 0){
+						container.removeChild(container.lastElementChild);
+					}		
+				}
+				
+				btnRightOut.onclick = function(){
+					if(container.childElementCount > 0){
+						container.removeChild(container.firstElementChild);
+					}
+				}
+				
+				btnLeftIn.onclick = function(){
+				
+					var innerHTML = container.innerHTML;
+					var childHTML = "<div class = 'cube'>"+Math.floor(Math.random(10)*10)+"</div>"
+					container.innerHTML = childHTML + innerHTML;
+				}
+				
+				btnRightIn.onclick = function(){
+				
+					var innerHTML = container.innerHTML;
+					var childHTML = "<div class = 'cube'>"+Math.floor(Math.random(10)*10)+"</div>"
+					container.innerHTML = innerHTML + childHTML;
+				}
+				
+				function Init(){
+					for(var i = 0; i < container.children.length; i++){
+						container.children[i].onclick = function(){
+							
+							this.parentNode.removeChild(this);
+							return function(){
+							 alert(i);
+							}
+						};
+					}
+				}
+				Init();*/
+			}
+		</script>
+	</head>
+	<body>
+		<input type = "text" id = "num" />
+		<input type = "button" class ="btn" id = "btnLeftIn" value = "左侧入" />
+		<input type = "button" class ="btn" id = "btnRightIn" value = "右侧入" />
+		<input type = "button" class ="btn" id = "btnLeftOut" value = "左侧出" />
+		<input type = "button" class ="btn" id = "btnRightOut" value = "右侧出" />
+		<div class = "content">
+			<div class = "cube">10</div>
+			<div class = "cube">3</div>
+			<div class = "cube">7</div>
+			<div class = "cube">12</div>
+			<div class = "cube">11</div>
+			<div class = "cube">30</div>
+		</div>
+	</body>
+</html>
