@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "utf-8" />
+		<style>
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			
+			ul{
+				list-style: none;
+			}
+			#container{
+				width: 1300px;
+				height: 675px;
+				margin: 0 auto;
+			}
+			#panel{
+				position: relative;
+				float: left;
+				width: 1000px;
+				height: 675px;
+				z-index: 1;
+				border: 1px solid black;
+			}
+			#consolePanel{
+				width: 200px;
+				height: 775px;
+				overflow: scroll;
+				float: left;
+				border: 1px solid black;
+			}
+			.square{
+				border: 1px solid red;
+				
+				background: white;
+				z-index: 1;
+				top: 0px; 
+				left: 0px;
+			}
+			.background{
+				position: absolute;
+				border: 1px solid blue;
+			
+				background: transparent;
+				top: 0px; 
+				left: 0px;
+				z-index: 20;
+			}
+		</style>
+		<script src = "jquery-3.1.0.min.js" ></script>
+		<script>
+			window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+			var spaceShips = []; 
+			var canvas;
+			var c;
+			var ORBIT_NUM = 4;
+			var SpaceShip = function(id){
+				this.id = id;
+				this.deg = 0;
+				this.power = 100;
+				this.state = "stop";
+			};
+			SpaceShip.prototype.PowerManager = function(){
+				var _self = this;
+				var fly = function(){
+					clearInterval(_self.timer);
+						_self.state = "fly";
+						if(_self.power > 0){
+							_self.timer = setInterval(function(){
+							_self.deg ++;
+								if(_self.power <= 0){
+									_self.state = "stop";
+									clearInterval(_self.timer);
+									
+								}
+							}, 20);
+						}
+						
+					
+				
+				};
+				var stop = function(){
+					_self.state = "stop";
+					clearInterval(_self.timer);	
+						
+				
+					
+				};
+				return {
+					fly: fly,
+					stop: stop
+				};
+			};
+			
+			SpaceShip.prototype.EnergyManager = function(){
+				var _self = this;
+				var charge = function(){
+					clearInterval(timer);
+					var timer = setInterval(function(){
+						
+						if(_self.power >= 100){
+							_self.power = 100;
+							clearInterval(timer);
+							return ;
+						} 
+						if(_self.state == "fly"){
+							clearInterval(timer);
+							return ;
+						}	
+						_self.power ++;
+					}, 20);
+				};
+				
+				var discharge = function(){
+						clearInterval(timer);
+						var timer = setInterval(function(){
+					
+						if(_self.power <= 0){
+							_self.power = 0;
+							_self.StateManager().changeState("stop");
+							clearInterval(timer);
+							return ;
+						} 
+						if(_self.state == "stop"){
+							clearInterval(timer);
+							return ;
+						}	
+						_self.power --;
+					}, 20);
+					
+					
+					
+				};
+				return{
+					charge: charge,
+					discharge: discharge
+				};
+			};
+			
+			SpaceShip.prototype.StateManager = function(){
+				var _self = this;
+				var states = {
+					fly: function(state){
+						_self.PowerManager().fly();
+						_self.EnergyManager().discharge();
+					},
+					stop: function(state){
+						_self.PowerManager().stop();
+						_self.EnergyManager().charge();
+					}
+					
+				};
+				var changeState = function(state){
+					states[state]&&states[state]();
+				};
+				return {
+					changeState: changeState
+				};
+			};
+			
+			var Message = function(id, command){
+				this.id = id;
+				this.command = command;
+			}
+			
+			var Mediator = function(){
+				var send = function(msg){
+					switch(msg.command){
+						case 'launch':
+							spaceShips[msg.id] = new SpaceShip(id);
+						break;
+						case 'fly':
+							spaceShips[msg.id].StateManager().changeState("fly");
+						break;
+						case 'stop':
+							spaceShips[msg.id].StateManager().changeState("stop");
+						break;
+						case 'destroy':
+							console.log(spaceShips.length);
+							delete spaceShips[msg.id];
+							console.log(spaceShips.length);
+						break;
+						default:
+							console.log("Invalid Message");
+						
+					}
+					
+				};
+				var regist = function(obj){
+					if(obj instanceof Commander){
+						obj.mediator = this;
+					} else if(obj instanceof SpaceShip){
+						spaceShips[obj.id] = obj;
+					}
+				};
+				
+				return{
+					send: send,
+					regist: regist
+				};
+			};
+		
+			var Commander = function(){
+				this.mediator = null;
+				this.message = null;
+			}
+			
+			Commander.prototype.send = function(msg){
+				this.mediator.send(msg);
+				ConsoleUtil.show(msg);
+			};
+			
+			var ConsoleUtil = (function(){
+				var show = function(msg){
+					 
+					var $msgLi = $("<li></li>");
+					$msgLi.text(msg);
+					$("#consolePanel ul").prepend($msgLi);
+				};
+				
+				return {
+					show: show
+				};
+			})();
+		
+		
+		
+			
+			
+			window.onload = function(){
+				var AnimUtil = (function(){
+				var canvas;
+				var context;
+				var drawBackground = (function(){
+					canvas = document.getElementsByClassName("background")[0];
+					context = canvas.getContext('2d');
+					for(var i = 0; i < ORBIT_NUM; i++){
+						context.beginPath();
+						context.lineWidth = 1;
+						context.strokeStyle = 'blue';
+						context.arc(500, 335, 50*(i+1), (Math.PI/180)*0, (Math.PI/180)*360, false);
+						context.stroke(); 
+					}
+					
+				})();
+				
+				var drawSpaceShip = function(spaceShip){
+					try{
+						context.save();
+						context.translate (500, 335);
+							
+						var id = spaceShip.id;
+						
+						var deg = spaceShip.deg;
+						var power = spaceShip.power;
+						
+						
+						context.rotate(-deg*Math.PI / 180);
+						context.beginPath();
+						context.arc(50*(id+1), 0, 10, (Math.PI/180)*0, (Math.PI/180)*360, false);
+						context.stroke();
+					
+						context.beginPath();
+						context.fillStyle = 'blue';
+						context.lineWidth = 5;
+						context.moveTo(40+50*(id), -10);
+				
+						context.lineTo(40+50*(id)+20*power/100, -10);
+						context.stroke();
+								
+						context.restore();
+					} catch(e){
+						context.clearRect(0, 0, canvas.width, canvas.height);
+					}
+					
+				
+				};
+				
+				var onDraw = function(){
+					if (!(spaceShips === undefined || spaceShips.every(function(item, index, array) {
+						return item === undefined; 
+					}))) {
+							canvas = document.getElementsByClassName("square")[0];
+							context = canvas.getContext('2d');
+							context.clearRect(0, 0, canvas.width, canvas.height);
+							for(var i = 0; i < spaceShips.length; i++){
+								if(spaceShips[i] !== undefined){
+									drawSpaceShip(spaceShips[i]);
+								}
+								
+							}
+					
+					}else {
+							canvas = document.getElementsByClassName("square")[0];
+							context = canvas.getContext('2d');
+							context.clearRect(0, 0, canvas.width, canvas.height);
+					
+					}
+				};
+				
+				var animLoop = function(){
+					requestAnimationFrame(animLoop);
+					onDraw();
+				};
+				
+				return {
+					animLoop: animLoop
+				};
+				
+			})();
+				var mediator = new Mediator();			
+				$("input").click(function() {
+					var id = $(this).parent().index();
+					var val = $(this).val();
+					switch(val){
+						case 'launch':
+							var spaceShip = new SpaceShip(id);
+							mediator.regist(spaceShip);	
+						break;
+						case 'fly':
+							var msg = new Message(id, "fly");
+							mediator.send(msg);
+						break;
+						case 'stop':
+							var msg = new Message(id, "stop");
+							mediator.send(msg);
+						break;
+						case 'destroy':
+							var msg = new Message(id, "destroy");
+							mediator.send(msg);
+						break;
+							
+					};
+				});
+				AnimUtil.animLoop();
+			}
+		</script>
+	</head>
+	<body>
+		<div id = "container">
+			<div id = "consolePanel">
+				<ul></ul>
+			</div>
+			<div id = "panel">
+				<canvas class = "square" width = "1000" height = "675">
+				</canvas>
+				<canvas class = "background" width = "1000" height = "675">
+				</canvas>
+				<div id ="controls">
+					<ul>
+						<li>
+							<input class= "btn" type = "button" name = "launch" value = "launch" />
+							<input type = "button" name = "fly" value = "fly" />
+							<input type = "button" name = "stop" value = "stop" />
+							<input type = "button" name = "destroy" value = "destroy" />
+						</li>
+						<li>
+							<input type = "button" name = "launch" value = "launch" />
+							<input type = "button" name = "fly" value = "fly" />
+							<input type = "button" name = "stop" value = "stop" />
+							<input type = "button" name = "destroy" value = "destroy" />
+						</li>
+						<li>
+							<input type = "button" name = "launch" value = "launch" />
+							<input type = "button" name = "fly" value = "fly" />
+							<input type = "button" name = "stop" value = "stop" />
+							<input type = "button" name = "destroy" value = "destroy" />
+						</li>
+						<li>
+							<input type = "button" name = "launch" value = "launch" />
+							<input type = "button" name = "fly" value = "fly" />
+							<input type = "button" name = "stop" value = "stop" />
+							<input type = "button" name = "destroy" value = "destroy" />
+						</li>
+					</ul>
+					
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>

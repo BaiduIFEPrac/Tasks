@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "utf-8" />
+		<style>
+			html, body{
+				width: 100%;
+				height: 100%;
+				text-align: center;
+			}
+			div{
+				display: flex;
+				flow-flex: row nowrap;
+				justify-content: space-around;
+				margin: 10px;
+				border: 1px solid black;
+			}
+		</style>
+		<script>
+			window.onload = function(){
+				var divList = [];
+				var index = 0;
+				var tempNode;
+				var root = document.getElementsByClassName('root')[0];
+				var btnDepthTravelsal = document.getElementById('btnDepthTravelsal');
+				var btnWidthTravelsal = document.getElementById('btnWidthTravelsal');
+				var btnDepthTravelsalSearch = document.getElementById('btnDepthTravelsalSearch');
+				var btnWidthTravelsalSearch = document.getElementById('btnWidthTravelsalSearch');
+				
+				function DepthTraversal(node){
+					divList.push(node);
+					console.log(divList);
+					for(var i = 0; i < node.children.length; i++){
+						DepthTraversal(node.children[i]);
+	
+					}
+				}
+				
+				function WidthTravelsal(node){
+					
+					if(node != null){
+						divList.push(node);
+						
+						if(node.nextElementSibling != null){
+							WidthTravelsal(node.nextElementSibling);
+						} 
+						node = divList[index++];
+						if(node.firstElementChild != null) {
+							
+							WidthTravelsal(node.firstElementChild);
+							
+						}
+
+					}
+				}
+				
+				function changeColor(searchText){
+					var i = 0;
+					divList[i].style.background = 'red';
+					if(divList[i].firstChild.nodeValue.replace(/(^\s*)|(\s*$)/g, "").trim() == searchText){
+						alert(searchText);
+						return ;
+					}
+					var timer = setInterval(function(){
+						i++;
+						if(i < divList.length){
+							divList[i-1].style.background = 'white';
+							divList[i].style.background = 'red';
+							if(divList[i].firstChild.nodeValue.replace(/(^\s*)|(\s*$)/g, "").trim() == searchText){
+								alert(searchText);
+								clearInterval(timer);
+								return ;
+							}
+						} else {
+							clearInterval(timer);
+							divList[i-1].style.background = 'white';
+						}		
+					}, 1000);
+				}
+				
+				btnDepthTravelsal.addEventListener('click', function(){
+					DepthTraversal(root);
+					changeColor(null);
+				}, false);
+				
+				btnWidthTravelsal.addEventListener('click', function(){
+					WidthTravelsal(root);
+					changeColor(null);
+				}, false);
+				
+				btnDepthTravelsalSearch.addEventListener('click', function(){
+					DepthTraversal(root);
+					var text = document.getElementById('searchText').value;
+					changeColor(text);
+				}, false);
+				
+				btnWidthTravelsalSearch.addEventListener('click', function(){
+					WidthTravelsal(root);
+					var text = document.getElementById('searchText').value;
+					changeColor(text);
+				}, false);
+			}
+		</script>
+	</head>
+	<body>
+		<content>
+			<div class = "root">
+				super
+				<div>
+					Can
+					<div>
+						apple
+						<div>
+							pear
+						</div>
+						<div>
+							pig
+						</div>
+						<div>
+							cola
+						</div>
+						<div>
+							soccer
+						</div>
+					</div>
+					
+					<div>
+						phone
+					</div>
+					<div>
+						<div>
+							bear
+						</div>
+						<div>
+							book
+						</div>
+						<div>
+							school
+						</div>
+					</div>
+				</div>
+				<div>
+					note
+					<div>
+						human
+						<div>
+							Code
+						</div>
+						<div>
+							Operate
+						</div>
+						<div>
+							Man
+						</div>
+					</div>
+					<div>
+						Program
+						<div>
+							Boment
+							<div>
+								Cat
+							</div>
+						</div>
+						<div>
+							Glass
+						</div>
+					</div>
+				</div>
+			</div>
+		</content>
+		
+		<input id = "btnDepthTravelsal" type = "button" value = "DepthTraversal" />
+		<input id = "btnWidthTravelsal" type = "button" value = "btnWidthTravelsal" />
+		<input id = "searchText" type = "text" />
+		<input id = "btnDepthTravelsalSearch" type = "button" value = "DepthTraversalSearch" />
+		<input id = "btnWidthTravelsalSearch" type = "button" value = "btnWidthTravelsalSearch" />
+	</body>
+</html>

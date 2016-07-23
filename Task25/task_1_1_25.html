@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = 'utf-8' />
+		<style>
+			html, body{
+				width: 100%;
+				height: 100%;
+				
+			}
+			div{
+				border: solid 1px black;
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: space-between;
+				overflow: auto;
+				font-size: 18px;
+				padding: 5px;
+				margin: 5px;
+			}
+			a{
+				border: 1px solid black;
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				text-align: center;
+			}
+	
+			.root{
+				width: 500px;
+				margin: 0 auto;
+			}
+			header{
+				width: 100%;
+				display: block;
+			}
+			content{
+				width: 100%;
+				display: block;
+				margin-bottom: 18px;
+			}
+			
+			
+		</style>
+		<script>
+			window.onload = function(){
+				var divList = [];
+				var tempList = [];
+				var root = document.getElementsByClassName('root')[0];
+				var btnDelete = document.getElementById('delete');
+				var btnAdd = document.getElementById('add'); 
+				var btnDepthTravelsal = document.getElementById('btnDepthTravelsal');
+				var btnWidthTravelsal = document.getElementById('btnWidthTravelsal');
+				var btnDepthTravelsalSearch = document.getElementById('btnDepthTravelsalSearch');
+				var btnWidthTravelsalSearch = document.getElementById('btnWidthTravelsalSearch');
+				var aList = [];
+				var tempNode;
+				var index = 0;
+				
+				function init(){
+					for(var i = 0; i < divList.length; i++){
+						(function(){
+							var arg = i;
+							divList[i].addEventListener('click', function(ev){
+								ev.stopPropagation();
+								for(var i = 0; i < divList.length; i++){
+									divList[i].style.background = 'white';
+								}
+								this.style.background = 'red';
+								tempNode = this;
+						}, false);
+						})();
+						
+					}
+				}
+				
+				 
+				function DepthTraversal(node){
+					var temp = node.getElementsByTagName('div');
+					tempList.push(node);
+					if(node.children[1]){
+						for(var i = 0; i < node.children[1].children.length; i++){
+							DepthTraversal(node.children[1].children[i]);
+						}
+					}
+				}
+				
+				function WidthTravelsal(node){
+					
+					if(node != null){
+						tempList.push(node);
+						if(node.nextElementSibling != null){
+							WidthTravelsal(node.nextElementSibling);
+						} 
+						node = tempList[index++];
+						if(node.children[1]) {
+							
+							WidthTravelsal(node.children[1].children[0]);
+							
+						}
+						
+
+					}
+				}
+				
+				function changeColor(searchText){
+					var i = 0;
+					tempList[i].style.background = 'red';
+					if(tempList[i].children[0].children[1].innerText.replace(/(^\s*)|(\s*$)/g, "").trim() == searchText){
+						alert(searchText);
+						return ;
+					}
+					var timer = setInterval(function(){
+						i++;
+						if(i < tempList.length){
+							tempList[i-1].style.background = 'white';
+							tempList[i].style.background = 'red';
+							if(tempList[i].children[0].children[1].innerText.replace(/(^\s*)|(\s*$)/g, "").trim() == searchText){
+								alert(searchText);
+								clearInterval(timer);
+								return ;
+							}
+						} else {
+							clearInterval(timer);
+							tempList[i-1].style.background = 'white';
+						}		
+					}, 1000);
+					
+				}
+				
+				aList = document.getElementsByTagName("a");
+				console.log(aList);
+				
+				
+				function init(){
+					var list = document.getElementsByTagName('div');
+					for(var i = 0; i < list.length; i++){
+						list[i].onclick = function(arg){
+							return function(ev){
+								for(var i = 0; i < list.length; i++){
+									list[i].style.background = 'white';									
+								}
+								ev.stopPropagation();
+								this.style.background = 'red';
+								tempNode = this;
+							}
+						}(i);
+					}
+					for(var i = 0; i < aList.length; i++){
+						aList[i].onclick = function(arg){
+							return function(){
+								var flag = this.dataset.flag;
+								if(flag == "true"){
+									this.getElementsByTagName('span')[0].innerText = '+';
+									this.parentNode.parentNode.getElementsByTagName("content")[0].style.display = "none";
+									this.dataset.flag = false;
+								
+								} else {
+									this.getElementsByTagName('span')[0].innerText = '-';
+									this.parentNode.parentNode.getElementsByTagName("content")[0].style.display = "block";
+									this.dataset.flag = true;
+								}
+							};
+						}(i);
+					}
+				}
+				
+				btnDepthTravelsal.onclick = function(){
+					DepthTraversal(root);
+					changeColor();
+				}
+				
+				btnWidthTravelsal.onclick = function(){
+					WidthTravelsal(root);
+					changeColor();
+				}
+				
+				init();
+				btnDelete.onclick = function(){
+					if(tempNode){
+						tempNode.parentNode.removeChild(tempNode);
+					}
+				}
+				
+				btnAdd.onclick = function(){
+					if(tempNode){
+						var content = tempNode.getElementsByTagName('content')[0];
+						content.innerHTML += '<div class= "child-3"><header><a data-flag = "true"><span>-</span></a><span>Child-3</span></header><content></content></div></content></div>'
+						init();
+					}
+				}
+				btnDepthTravelsalSearch.addEventListener('click', function(){
+					DepthTraversal(root);
+					var text = document.getElementById('searchText').value;
+					changeColor(text);
+				}, false);
+				
+				btnWidthTravelsalSearch.addEventListener('click', function(){
+					WidthTravelsal(root);
+					var text = document.getElementById('searchText').value;
+					changeColor(text);
+				}, false);
+			
+			}
+		</script>
+	</head>
+	<body>
+		<content>
+			<div class = "root">
+				<header>
+					<a data-flag = "true">
+						<span>-</span>
+					</a>
+					<span>
+						ROOT
+					</span>
+				</header>
+				<content>
+					<div class = "child-1">
+						<header>
+							<a data-flag = "true">
+								<span>-</span>
+							</a>
+							<span>
+								Child-1
+							</span>
+						</header>
+						<content>
+							<div class= "child-3">
+										<header>
+											<a data-flag = "true">
+												<span>-</span>
+											</a>
+											<span>
+												Child-3
+											</span>
+										</header>
+										<content>
+										</content>
+									</div>
+							<div class = "child-2">
+								<header>
+									<a data-flag = "true">
+										<span>-</span>
+									</a>
+									<span>
+										Child-2
+									</span>
+								</header>
+								<content>
+									<div class= "child-3">
+										<header>
+											<a data-flag = "true">
+												<span>-</span>
+											</a>
+											<span>
+												Child-3
+											</span>
+										</header>
+										<content>
+										</content>
+									</div>
+									<div class= "child-3">
+										<header>
+											<a data-flag = "true">
+												<span>-</span>
+											</a>
+											<span>
+												Child-3
+											</span>
+										</header>
+										<content>
+										</content>
+									</div>
+								</content>
+							</div>
+							<div class= "child-3">
+										<header>
+											<a data-flag = "true">
+												<span>-</span>
+											</a>
+											<span>
+												Child-3
+											</span>
+										</header>
+										<content>
+										</content>
+									</div>
+
+						</content>
+					</div>
+				</content>
+				
+			</div>
+		</content>
+		<input type = "button" id = "delete" value = "delete"/>
+		<input type = "text" id = "addText" />
+		<input type = "button" id = "add" value = "add" />
+		<input id = "btnDepthTravelsal" type = "button" value = "DepthTraversal" />
+		<input id = "btnWidthTravelsal" type = "button" value = "WidthTravelsal" />
+		<input id = "searchText" type = "text" />
+		<input id = "btnDepthTravelsalSearch" type = "button" value = "DepthTraversalSearch" />
+		<input id = "btnWidthTravelsalSearch" type = "button" value = "btnWidthTravelsalSearch" />
+		
+	</body>
+</html>
